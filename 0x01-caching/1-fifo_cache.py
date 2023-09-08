@@ -19,6 +19,7 @@ class FIFOCache(BaseCaching):
         method overloading
         """
         super().__init__()
+        self.caches_now = []
 
     def put(self, key, item):
         """
@@ -29,9 +30,12 @@ class FIFOCache(BaseCaching):
         """
         if key and item:
             self.cache_data[key] = item
-        if len(self.cache_data) > BaseCaching.MAX_ITEMS:
-            Key, value = self.cache_data.popitem()
-            print(f"DISCARD:{Key}")
+            if key not in self.caches_now:
+                self.caches_now.append(key)
+            if len(self.cache_data) > BaseCaching.MAX_ITEMS:
+                Key = self.caches_now.pop(0)
+                del self.cache_data[Key]
+                print(f"DISCARD:{Key}")
 
     def get(self, key):
         """
