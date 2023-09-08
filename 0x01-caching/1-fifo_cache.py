@@ -38,4 +38,4 @@ class FIFOCache(BaseCaching):
         this returns the value
         related to the key
         """
-        return self.cache_data[key] or None
+        return self.cache_data.get(key) or None
