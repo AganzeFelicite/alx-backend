@@ -1,47 +1,41 @@
 #!/usr/bin/env python3
-
-"""
-Contains a MRUCaching class
-"""
+""" caching system
+    """
 
 from base_caching import BaseCaching
-from collections import deque, OrderedDict
 
 
-class MRUCache(BaseCaching):
+class LFUCache(BaseCaching):
+    """ caching system:
+
+    Args:
+        LFUCache ([class]): [basic caching]
     """
-    LRUcache class that uses the LRU algorithm and inherits from
-        Basecaching
-    """
-    def __init__(self):
+
+    def __init__(self) -> None:
+        """ initialize of class """
+        self.temp_list = {}
         super().__init__()
-        self.cache_data = OrderedDict()
 
     def put(self, key, item):
+        """ Add an item in the cache
         """
-        Adds a new key-value pair to the cache
-        Args:
-            Key: Key to be added
-            item: Value of the added key
-        """
-        if key is None or item is None:
-            return
-        if key not in self.cache_data:
-            if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-                k, v = self.cache_data.popitem()
-                print(f"DISCARD: {k}")
+        if not (key is None or item is None):
             self.cache_data[key] = item
-            self.cache_data.move_to_end(key, last=True)
-        self.cache_data[key] = item
-        self.cache_data.move_to_end(key, last=True)
+            if len(self.cache_data.keys()) > self.MAX_ITEMS:
+                pop = min(self.temp_list, key=self.temp_list.get)
+                self.temp_list.pop(pop)
+                self.cache_data.pop(pop)
+                print(f"DISCARD: {pop}")
+            if not (key in self.temp_list):
+                self.temp_list[key] = 0
+            else:
+                self.temp_list[key] += 1
 
     def get(self, key):
+        """ Get an item by key
         """
-        Retrieves the value of the key provided from the dict
-        Returns none if the key is empty or is not valid key in the dict
-        """
-        if key is not None and key in self.cache_data:
-            self.cache_data.move_to_end(key, last=True)
-            return self.cache_data[key]
-        elif not key or key not in self.cache_data:
+        if (key is None) or not (key in self.cache_data):
             return None
+        self.temp_list[key] += 1
+        return self.cache_data.get(key)
