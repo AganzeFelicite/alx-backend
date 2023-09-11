@@ -48,4 +48,7 @@ class LRUCache(BaseCaching):
         this returns the value
         related to the key
         """
-        return self.cache_data.get(key) or None
+        if key in self.cache_data:
+            self.caches_now.move_to_end(key)
+            return self.cache_data[key]
+        return None
