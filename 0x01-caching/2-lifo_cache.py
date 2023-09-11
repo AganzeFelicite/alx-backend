@@ -29,13 +29,17 @@ class LIFOCache(BaseCaching):
         BaseCaching.MAX_ITEMS
         """
         if key and item:
+            if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
+                if key in self.cache_data:
+                    del self.cache_data[key]
+                    self.caches_now.remove(key)
+                else:
+                    del self.cache_data[self.caches_now[self.MAX_ITEMS - 1]]
+                    item_discarded = self.caches_now.pop(self.MAX_ITEMS - 1)
+                    print("DISCARD:", item_discarded)
+
             self.cache_data[key] = item
-            if key not in self.caches_now:
-                self.caches_now.append(key)
-            if len(self.cache_data) > BaseCaching.MAX_ITEMS:
-                Key = self.caches_now[-1]
-                del self.cache_data[Key]
-                print(f"DISCARD: {Key}")
+            self.caches_now.append(key)
 
     def get(self, key):
         """
