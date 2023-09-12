@@ -14,7 +14,7 @@ app = Flask(__name__)
 babel = Babel(app)
 
 
-def config():
+class config:
     '''
     this is a config file
     '''
