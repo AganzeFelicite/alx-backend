@@ -40,12 +40,7 @@ def index():
     """
     simple hello world
     """
-    home_title = gettext('home_title')
-    home_header = gettext("home_header")
-    result = {'home_title': home_title,
-              'home_header': home_header
-              }
-    return render_template('3-index.html', result=result)
+    return render_template('3-index.html')
 
 
 # if "__main__" == __name__:
