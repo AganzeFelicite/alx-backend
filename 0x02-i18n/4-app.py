@@ -31,7 +31,9 @@ def get_locale():
     determine the best match with our
     supported languages.
     """
-
+    locale = request.args.get('locale')
+    if locale:
+        return locale
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
@@ -40,7 +42,7 @@ def index():
     """
     simple hello world
     """
-    return render_template('3-index.html')
+    return render_template('4-index.html')
 
 
 # if "__main__" == __name__:
