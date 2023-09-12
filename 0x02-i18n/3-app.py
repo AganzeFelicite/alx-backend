@@ -13,7 +13,6 @@ from flask_babel import Babel, gettext
 app = Flask(__name__)
 
 
-
 class Config:
     '''
     this is a config file
