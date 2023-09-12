@@ -31,16 +31,19 @@ def get_locale():
     determine the best match with our
     supported languages.
     """
-    locale = request.args.get('locale', '')
-    if locale in app.config["LANGUAGES"]:
+    locale = request.args.get("locale")
+    if locale:
         return locale
-    if g.user and g.user['locale'] in app.config["LANGUAGES"]:
-        return g.user['locale']
-    header_locale = request.headers.get('locale', '')
-    if header_locale in app.config["LANGUAGES"]:
-        return header_locale
-    return request.accept_languages.best_match(app.config["LANGUAGES"])
-    
+    user = request.args.get("login_as")
+    if user:
+        lang = users.get(int(user)).get('locale')
+        if lang in app.config['LANGUAGES']:
+            return lang
+    headers = request.headers.get("locale")
+    if headers:
+        return headers
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
+
 
 users = {
     1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
