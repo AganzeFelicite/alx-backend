@@ -8,6 +8,9 @@ is running
 from flask import Flask, request, g
 from flask import render_template
 from flask_babel import Babel
+import pytz
+from datetime import datetime
+
 
 app = Flask(__name__)
 
@@ -31,13 +34,17 @@ def get_locale():
     determine the best match with our
     supported languages.
     """
-    locale = request.args.get('locale')
+    locale = request.args.get("locale")
     if locale:
         return locale
-    if g.user.get("locale") is not None:
-        return g.user.get("locale")
-    if request.headers.get("locale") is not None:
-        return request.headers.get("locale")
+    user = request.args.get("login_as")
+    if user:
+        lang = users.get(int(user)).get('locale')
+        if lang in app.config['LANGUAGES']:
+            return lang
+    headers = request.headers.get("locale")
+    if headers:
+        return headers
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
@@ -62,6 +69,28 @@ def get_user():
         return None
 
 
+@babel.timezoneselector
+def get_timezone():
+    """
+    get the timezone
+    object to workwith
+    """
+    timezone = request.args.get('timezone', '')
+    try:
+        return pytz.timezone(timezone)
+    except pytz.exceptions.UnknownTimeZoneError:
+        try:
+            if g.user:
+                return pytz.timezone(g.user['timezone'])
+        except pytz.exceptions.UnknownTimeZoneError:
+            header_timezone = request.headers.get('timezone', '')
+            try:
+                return pytz.timezone(header_timezone)
+            except pytz.exceptions.UnknownTimeZoneError:
+                pass
+    return app.config["BABEL_DEFAULT_TIMEZONE"]
+
+
 @app.before_request
 def before_request():
     """
@@ -69,7 +98,9 @@ def before_request():
     that runs before all
     the functioons
     """
+    
     g.user = get_user()
+    g.current_time = datetime.now(get_timezone())
 
 
 @app.route("/", methods=['GET'], strict_slashes=False)
@@ -77,7 +108,8 @@ def index():
     """
     simple hello world
     """
-    return render_template('6-index.html')
+    
+    return render_template('index.html')
 
 
 # if "__main__" == __name__:
