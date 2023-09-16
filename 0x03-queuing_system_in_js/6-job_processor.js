@@ -14,3 +14,4 @@ function notifications(phoneNumber, message, done) {
 queue.process('push_notification_code', (job, done) => {
   notifications(job.data.phoneNumber, job.data.message, done);
 });
+
